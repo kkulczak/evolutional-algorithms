@@ -33,7 +33,7 @@ def pbil(
         propability_vector[mutated_ids] = np.clip(
             (
                 propability_vector[mutated_ids] * (1 - theta3) +
-                (np.random.rand(mutated_ids.sum()) < 0.5) * theta1
+                (np.random.rand(mutated_ids.sum()) < 0.5) * theta3
             ),
             0,
             1
