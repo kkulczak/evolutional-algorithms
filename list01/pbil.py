@@ -9,7 +9,9 @@ def pbil(F, d, N, th1, th2, th3, steps=500):
     p = np.ones((d, 1)) / 2
     population = np.random.rand(d, N) < p
     result = F(population)
-      
+    # print(result.max())
+    # raise Exception
+    
     plot_probs[0] = p.reshape(-1)
     plot_scores[0] = np.max(result)
     
