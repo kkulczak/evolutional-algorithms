@@ -20,11 +20,11 @@ def mutation(P, Tau, Tau0):
     xs = P[:, :ind_size]
     sigmas = P[:, ind_size:]
 
-    epsilons_i = np.random.randn(*sigmas.shape) * Tau
-    epsilons_0 = np.random.randn(sigmas.shape[0], 1) * Tau0
+    epsilons_i = np.random.randn(*sigmas.shape) * (Tau ** 2)
+    epsilons_0 = np.random.randn(sigmas.shape[0], 1) * (Tau0 ** 2)
     sigmas *= np.exp(epsilons_0 + epsilons_i)
 
-    xs += np.random.randn(*xs.shape) * sigmas
+    xs += np.random.randn(*xs.shape) * (sigmas ** 2)
 
 
 def replacement(From, Mu):
@@ -46,16 +46,17 @@ def ES_mu_lambda(
     individual_size,
     iterations=50,
     plus=True,
-    Mu=500,
-    Lambda=300,
-    Tau=1,
-    Tau0=1,
+    Mu=400,
+    Lambda=800,
+    K=0.5,
     domain=(0, 1),
     verbose=False,
     **kwargs
 
 
 ):
+    Tau = K / np.sqrt(2 * individual_size) 
+    Tau0 = K / np.sqrt(2 * np.sqrt(individual_size))
     logs = {x.__name__: [] for x in PARAMETERS_TO_SAVE}
 
     P = np.hstack((
@@ -76,7 +77,7 @@ def ES_mu_lambda(
         children_P = parent_selection(P, scores, Lambda)
         mutation(children_P, Tau, Tau0)
         if plus:
-            P = replacement(np.vstack((P, children_P)))
+            P = replacement(np.vstack((P, children_P)), Mu)
         else:
             P = children_P
         scores = population_evaluation(P[:individual_size])

@@ -1,19 +1,30 @@
 import numpy as np
 
 
-class Griewank():
-    def function(self, X):
-        return (
-            1
-            + (X ** 2).sum(axis=1) / 4000
-            - np.prod(
-                np.cos(
-                    X / np.sqrt(np.arange(1, X.shape[-1] + 1))
-                ),
-                axis=1
-            )
+def griewank(X):
+    return (
+        1
+        + (X ** 2).sum(axis=1) / 4000
+        - np.prod(
+            np.cos(
+                X / np.sqrt(np.arange(1, X.shape[-1] + 1))
+            ),
+            axis=1
         )
-    
+    )
+
+
+def rastrigin(v):  # min @ 0*
+    return 10*v.size + (v**2 - 10*np.cos(2*np.pi*v)).sum(1)
+
+
+def schwefel(v):  # min @ 420.9687*
+    return 418.9829*v.size - (v*np.sin(np.sqrt(np.abs(v)))).sum(1)
+
+
+def levy(v):  # min @ 1*
+    w = 1 + (v - 1)/4
+    return np.sin(np.pi*w[0])**2 + (w[v.size - 1] - 1)**2 * (1 + (np.sin(2*np.pi*w[v.size - 1]))**2) + ((w[1:-1] - 1)**2 * (1 + 10*(np.sin(np.pi * w[1:-1] + 1)**2))).sum(1)
 
 
 if __name__ == "__main__":
