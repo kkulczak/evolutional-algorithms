@@ -69,7 +69,7 @@ def ES_mu_lambda(
         ),
         np.random.uniform(
             low=1,
-            high=domain[1] / 4,
+            high=domain[1] * 3 / 4,
             size=(Mu, individual_size)
         )
     ))
