@@ -11,6 +11,7 @@ def compare(func_list, tries=10):
     return res
 
 def f(arg):
+    # print(arg)
     i, func_list = arg
     res = []
     for f, kwargs in func_list:
@@ -52,7 +53,8 @@ def plot_scores(**kwargs):
     print(kwargs['title'], best, time.time() - t0)
     x, y = costs.shape
     plt.figure(figsize=(15,5))
-    plt.plot(range(x), costs.min(axis=1))
-    plt.plot(range(x), costs.max(axis=1))
-    plt.plot(range(x), costs.mean(axis=1))
+    plt.plot(range(x), costs.min(axis=1), label='min val')
+    plt.plot(range(x), costs.max(axis=1), label='max val')
+    plt.plot(range(x), costs.mean(axis=1), label='mean val')
+    plt.legend()
     plt.show()

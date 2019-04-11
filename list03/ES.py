@@ -55,6 +55,7 @@ def ES_mu_lambda(
 
 
 ):
+    np.random.RandomState()
     Tau = K / np.sqrt(2 * individual_size)
     Tau0 = K / np.sqrt(2 * np.sqrt(individual_size))
     logs = {x.__name__: [] for x in PARAMETERS_TO_SAVE}

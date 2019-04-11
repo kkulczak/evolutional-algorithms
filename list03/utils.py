@@ -6,6 +6,7 @@ from multiprocessing import Pool
 
 def plot_hist(data):
     for option_name, data in data.items():
+        print([x[0] for x in data])
         plt.hist([x[0] for x in data], label=option_name)
     plt.legend()
     plt.show()
@@ -22,6 +23,7 @@ def _lambda_ES(x):
 def run_multiproc_hist(kwargs, cores=8):
     with Pool(cores) as p:
         data = p.map(_lambda_ES, [kwargs] * 8)
+    print(len(data))
     plot_one(data[0], title=gen_title(kwargs))
     plot_hist({gen_title(kwargs): data})
 
