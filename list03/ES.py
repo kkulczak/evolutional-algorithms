@@ -55,7 +55,6 @@ def ES_mu_lambda(
 
 
 ):
-    np.random.RandomState()
     Tau = K / np.sqrt(2 * individual_size)
     Tau0 = K / np.sqrt(2 * np.sqrt(individual_size))
     logs = {x.__name__: [] for x in PARAMETERS_TO_SAVE}
@@ -66,7 +65,11 @@ def ES_mu_lambda(
             high=domain[1],
             size=(Mu, individual_size)
         ),
-        np.random.rand(*(Mu, individual_size))
+        np.random.uniform(
+            low=1,
+            high=domain[1] / 4,
+            size=(Mu, individual_size)
+        )
     ))
 
     P_scores = population_evaluation(P[:, :individual_size])
