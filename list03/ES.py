@@ -51,10 +51,12 @@ def ES_mu_lambda(
     K=0.5,
     domain=(0, 1),
     verbose=False,
+    seed=None,
     **kwargs
 
 
 ):
+    np.random.seed(seed)
     Tau = K / np.sqrt(2 * individual_size)
     Tau0 = K / np.sqrt(2 * np.sqrt(individual_size))
     logs = {x.__name__: [] for x in PARAMETERS_TO_SAVE}

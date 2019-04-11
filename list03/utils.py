@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from ES import ES_mu_lambda
-from multiprocessing.pool import ThreadPool
+from multiprocessing import Pool
 
 
 def plot_hist(data):
@@ -15,14 +15,22 @@ def gen_title(x):
     return f'{x["population_evaluation"].__name__}_{x["individual_size"]}'
 
 
+def uncurry(arg):
+    return arg[0](**arg[1])
+
+
 def run_multiproc_hist(kwargs, cores=8):
-    with ThreadPool(cores) as p:
+    with Pool(cores) as p:
         data = p.map(
-            lambda x: ES_mu_lambda(**kwargs),
-            range(cores)
+            uncurry,
+            [
+                (
+                    ES_mu_lambda,
+                    {**kwargs, 'seed': np.random.randint(0,  2**32 - 1)}
+                )
+                for i in range(cores)
+            ]
         )
-        p.close()
-        p.join()
     plot_one(data[0], title=gen_title(kwargs))
     plot_hist({gen_title(kwargs): data})
 
