@@ -4,12 +4,16 @@ PARAMETERS_TO_SAVE = (np.min, np.max, np.mean)
 
 
 def parent_selection(P, scores, Lambda):
-    props = 1 / scores
+    fitness_values = scores.max() - scores
+    if fitness_values.sum() > 0:
+        fitness_values = fitness_values / fitness_values.sum()
+    else:
+        fitness_values = np.ones(scores.size) / scores.size
     children_ids = np.random.choice(
         range(scores.size),
         size=Lambda,
         replace=True,
-        p=(props / props.sum()).squeeze()
+        p=fitness_values
     )
     return P[children_ids]
 
@@ -20,20 +24,16 @@ def mutation(P, Tau, Tau0):
     xs = P[:, :ind_size]
     sigmas = P[:, ind_size:]
 
-    epsilons_i = np.random.randn(*sigmas.shape) * (Tau ** 2)
-    epsilons_0 = np.random.randn(sigmas.shape[0], 1) * (Tau0 ** 2)
+    epsilons_i = np.random.randn(*sigmas.shape) * (Tau)
+    epsilons_0 = np.random.randn(sigmas.shape[0], 1) * (Tau0)
     sigmas *= np.exp(epsilons_0 + epsilons_i)
 
-    xs += np.random.randn(*xs.shape) * (sigmas ** 2)
+    xs += np.random.randn(*xs.shape) * (sigmas)
 
 
-def replacement(From, Mu):
-    ids = np.random.choice(
-        np.arange(From.shape[0]),
-        size=Mu,
-        replace=False
-    )
-    return From[ids]
+def replacement(pop, scores, Mu):
+    chosen = np.argsort(scores)[:Mu]
+    return pop[chosen], scores[chosen]
 
 
 def save_logs(scores, logs):
@@ -55,34 +55,45 @@ def ES_mu_lambda(
 
 
 ):
-    Tau = K / np.sqrt(2 * individual_size) 
+    Tau = K / np.sqrt(2 * individual_size)
     Tau0 = K / np.sqrt(2 * np.sqrt(individual_size))
     logs = {x.__name__: [] for x in PARAMETERS_TO_SAVE}
 
     P = np.hstack((
         np.random.uniform(
             low=domain[0],
-            high=[1],
+            high=domain[1],
             size=(Mu, individual_size)
         ),
         np.random.rand(*(Mu, individual_size))
     ))
 
-    scores = population_evaluation(P[:individual_size])
+    P_scores = population_evaluation(P[:, :individual_size])
 
     for i in range(iterations):
         if verbose:
             print('.', end='')
-        save_logs(scores, logs)
-        children_P = parent_selection(P, scores, Lambda)
+        save_logs(P_scores, logs)
+        children_P = parent_selection(P, P_scores, Lambda)
         mutation(children_P, Tau, Tau0)
+        
+        children_scores = population_evaluation(children_P[:, :individual_size])
+        
         if plus:
-            P = replacement(np.vstack((P, children_P)), Mu)
+            P, P_scores = replacement(
+                np.vstack((P, children_P)),
+                np.hstack((P_scores, children_scores)),
+                Mu
+            )
         else:
-            P = children_P
-        scores = population_evaluation(P[:individual_size])
-    save_logs(scores, logs)
-    return scores.min(), P[scores.argmin()], logs
+            P, P_scores = replacement(
+                children_P,
+                children_scores,
+                Mu
+            )
+
+    save_logs(P_scores, logs)
+    return P_scores.min(), P[P_scores.argmin()], logs
 
 
 def test():

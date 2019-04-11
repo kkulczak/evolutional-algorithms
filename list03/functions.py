@@ -2,6 +2,9 @@ import numpy as np
 
 
 def griewank(X):
+    """ minimum @ 0
+    """
+
     return (
         1
         + (X ** 2).sum(axis=1) / 4000
@@ -14,18 +17,72 @@ def griewank(X):
     )
 
 
-def rastrigin(v):  # min @ 0*
-    return 10*v.size + (v**2 - 10*np.cos(2*np.pi*v)).sum(1)
+# def rastrigin(v):  # min @ 0*
+#     return 10*v.size + (v**2 - 10*np.cos(2*np.pi*v)).sum(1)
 
 
-def schwefel(v):  # min @ 420.9687*
-    return 418.9829*v.size - (v*np.sin(np.sqrt(np.abs(v)))).sum(1)
+# def schwefel(v):  # min @ 0*
+#     return 418.9829*v.size - (v*np.sin(np.sqrt(np.abs(v)))).sum(1)
+
+def rastrigin(P):
+    n = P.shape[-1]
+    return (
+        P**2 - 10 * np.cos(2*np.pi * P)
+    ).sum(axis=1) + 10*n
 
 
-def levy(v):  # min @ 1*
-    w = 1 + (v - 1)/4
-    return np.sin(np.pi*w[0])**2 + (w[v.size - 1] - 1)**2 * (1 + (np.sin(2*np.pi*w[v.size - 1]))**2) + ((w[1:-1] - 1)**2 * (1 + 10*(np.sin(np.pi * w[1:-1] + 1)**2))).sum(1)
+def schwefel(P):
+    n = P.shape[-1]
+    return np.sum(
+        P * np.sin(
+            np.sqrt(
+                np.abs(P)
+            )
+        ),
+        axis=1
+    ) + 418.9829*n
 
+
+def sphere(P):
+    return np.sum(P**2, axis=1)
+
+
+def dp(P):
+    return (P[:, 0]-1) ** 2 + np.sum(
+        (
+            2 * P[:, 1:]**2 - P[:, :-1]**2
+        ) ** 2 *
+        np.arange(2, P.shape[-1] + 1), axis=1
+    )
+
+
+tests = [
+    {
+        'population_evaluation': griewank,
+        'individual_size': 80,
+        'domain': (-500, 500)
+    },
+    { 
+        'population_evaluation': rastrigin,
+        'individual_size': 60,
+        'domain': (-5.12, 5.12)
+    },
+    { 
+        'population_evaluation': schwefel,
+        'individual_size': 60,
+        'domain': (-500, 500)
+    },
+    { 
+        'population_evaluation': dp,
+        'individual_size': 500,
+        'domain': (-10, 10)
+    },
+    { 
+        'population_evaluation': sphere,
+        'individual_size': 60,
+        'domain': (-5.12, 5.12)
+    }
+]
 
 if __name__ == "__main__":
     # pop = np.array([
