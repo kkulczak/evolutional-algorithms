@@ -162,6 +162,7 @@ def run_es(
     plot=True,
     sigma=50.0,
     verbose=True,
+    K=1
 
 ):
     result = es(
@@ -172,8 +173,8 @@ def run_es(
         number_of_offspring=2*N,
         number_of_parents=number_of_parents,
         sigma=sigma,
-        tau=1/np.sqrt(2*d),
-        tau_0=1/np.sqrt(2*np.sqrt(d)),
+        tau=K/np.sqrt(2*d),
+        tau_0=K/np.sqrt(2*np.sqrt(d)),
         log_frequency=log_frequency,
         verbose=verbose
     )
